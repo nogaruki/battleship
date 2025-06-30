@@ -4,9 +4,9 @@ import Game from "@/models/Game";
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }  //  💡 ⬅ params = Promise
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;                     // 🔸 on await la Promise
+    const { id } = await params;
     await dbConnect();
 
     const { userId, board } = await req.json();
