@@ -6,11 +6,12 @@ interface BoardProps {
     interactive?: boolean;
     hideShips?: boolean;
 }
-export const Board = memo(({ grid, onShoot, interactive, hideShips }: BoardProps) => (
-    <div className="grid grid-cols-10 gap-1">
+export function Board({ grid, onShoot, interactive, hideShips }: BoardProps) {
+    return (
+        <div className="grid grid-cols-10 gap-1">
         {grid.map((row, y) =>
             row.map((cell, x) => {
-                const visual = hideShips && cell === 1 ? 0 : cell;   // 🚫 visible
+                const visual = hideShips && cell === 1 ? 0 : cell;
                 return (
                     <div
                         key={`${x}-${y}`}
@@ -30,4 +31,5 @@ export const Board = memo(({ grid, onShoot, interactive, hideShips }: BoardProps
             })
         )}
     </div>
-));
+    )
+}

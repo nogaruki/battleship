@@ -4,12 +4,12 @@ import Game from "@/models/Game";
 
 export async function GET(
     _req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }   // ← params est UNE Promise
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;                      // ← on l’attend
+    const { id } = await params;
     await dbConnect();
 
-    const game = await Game.findById(id).lean();
+    const game = await Game.findById(id).populate("players", "pseudo").lean();
     if (!game)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 

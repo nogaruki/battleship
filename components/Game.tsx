@@ -3,6 +3,8 @@ import { Board } from "@/components/Board";
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 
+type Player = { _id: string; pseudo: string };
+
 interface GameProps {
     gameId: string;
     userId: string;
@@ -10,19 +12,21 @@ interface GameProps {
 
 type GameDoc = {
     _id: string;
-    players: string[];
+    players: Player[];
     turn: number;
-    boards: number[][][]; // [2] x 10 x 10
+    boards: number[][][];
     shots: { x: number; y: number; hit: boolean }[][];
 };
 
 export default function Game({ gameId, userId }: GameProps) {
     const [game, setGame] = useState<GameDoc | null>(null);
     const [loadingShot, setLoadingShot] = useState(false);
-
-    const meIdx = game?.players.findIndex((p) => p === userId) ?? 0;
+    if (!game) return <p>Chargement…</p>;
+    const meIdx = game.players.findIndex((p) => p._id === userId) ?? 0;
     const enemyIdx = 1 - meIdx;
-    const myTurn = game?.turn === meIdx;
+    const myTurn = game.turn === meIdx;
+    const me     = game.players[meIdx];
+    const enemy  = game.players[enemyIdx];
 
     /* -------- fetch loop -------- */
 
@@ -82,6 +86,7 @@ export default function Game({ gameId, userId }: GameProps) {
         status = "⏳ Tour adverse…";
     }
     const canShoot = bothReady && myTurn && enemyShipsLeft && myShipsLeft;
+
     return (
         <section className="flex flex-col items-center gap-6">
             <h2 className="text-2xl font-semibold">{status}</h2>
@@ -89,7 +94,9 @@ export default function Game({ gameId, userId }: GameProps) {
             <div className="grid grid-cols-2 gap-8">
                 {/* ----- enemy board (clics actifs) ----- */}
                 <div className="space-y-2">
-                    <h3 className="text-lg font-medium text-center">Grille ennemie</h3>
+                    <h3 className="text-lg font-medium text-center">
+                        {enemy ? `🎯 ${enemy.pseudo}` : "🕐 En attente…"}
+                    </h3>
 
                     <Board
                         grid={game.boards[enemyIdx]}
@@ -104,7 +111,7 @@ export default function Game({ gameId, userId }: GameProps) {
 
                 {/* ----- your board ----- */}
                 <div className="space-y-2">
-                    <h3 className="text-lg font-medium text-center">Ta grille</h3>
+                    <h3 className="text-lg font-medium text-center">{me.pseudo}</h3>
                     <Board grid={game.boards[meIdx]} />
                 </div>
             </div>

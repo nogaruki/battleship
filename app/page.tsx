@@ -30,7 +30,10 @@ function randomBoard() {
 
 /* ---------- main component ---------- */
 
-type GameSummary = { _id: string; players: string[] };
+type GameSummary = {
+    _id: string;
+    players: { _id: string; pseudo: string }[];
+};
 
 export default function Home() {
     const { user, login } = useAuth();
@@ -163,7 +166,7 @@ export default function Home() {
                             className="border rounded flex items-center justify-between p-3"
                         >
               <span>
-                {g.players[0]} <span className="opacity-50">attend…</span>
+                {g.players[0].pseudo} <span className="opacity-50">attend…</span>
               </span>
                             <button
                                 onClick={() => handleJoin(g._id)}
