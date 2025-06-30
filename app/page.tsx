@@ -102,7 +102,7 @@ export default function Home() {
         );
     }
 
-    // 1️⃣ ► GAME (placeholder → tu as sûrement déjà un `<Game>` ailleurs)
+    // 1️⃣ ► GAME
     if (currentGameId) {
         return (
             <main className="p-6">
