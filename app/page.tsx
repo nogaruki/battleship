@@ -139,7 +139,7 @@ export default function Home() {
                 <h2 className="font-semibold text-xl">2 · Crée ta partie</h2>
                 <button
                     onClick={handleCreate}
-                    className="bg-black text-white px-4 py-2 rounded"
+                    className="bg-gray-600 text-white px-4 py-2 rounded"
                 >
                     🚀 Créer & attendre quelqu’un
                 </button>
