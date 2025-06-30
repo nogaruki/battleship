@@ -3,6 +3,7 @@ import { useAuth } from "@/stores/useAuth";
 import { Board } from "@/components/Board";
 import { useState, useEffect, useCallback } from "react";
 import Game from "@/components/Game";
+import {fetchWithToast} from "@/lib/fetchWithToast";
 /* ---------- tiny helpers ---------- */
 
 const emptyBoard = () => Array.from({ length: 10 }, () => Array(10).fill(0));
@@ -53,10 +54,11 @@ export default function Home() {
     /* -------- lobby actions -------- */
 
     async function handleCreate() {
-        const res = await fetch("/api/game/new", {
+        const res = await fetchWithToast("/api/game/new", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: user!._id, board }),
+            success: "Partie créée – en attente"
         });
         if (res.ok) {
             const { gameId } = await res.json();
@@ -65,10 +67,11 @@ export default function Home() {
     }
 
     async function handleJoin(gameId: string) {
-        const res = await fetch(`/api/game/${gameId}/join`, {
+        const res = await fetchWithToast(`/api/game/${gameId}/join`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: user!._id, board }),
+            success: "Partie rejointe 👍",
         });
         if (res.ok) setCurrentGameId(gameId);
     }
@@ -87,7 +90,7 @@ export default function Home() {
                 />
                 <button
                     onClick={() => login(pseudo)}
-                    className="bg-black text-white px-4 py-2 rounded disabled:opacity-40"
+                    className="bg-gray-600 hover:bg-gray-400 cursor-pointer text-white px-4 py-2 rounded disabled:opacity-40"
                     disabled={!pseudo.trim()}
                 >
                     Entre
@@ -121,13 +124,13 @@ export default function Home() {
                 <div className="flex gap-3">
                     <button
                         onClick={() => setBoard(randomBoard())}
-                        className="border px-3 py-1 rounded"
+                        className="border cursor-pointer px-3 py-1 rounded"
                     >
                         Random
                     </button>
                     <button
                         onClick={() => setBoard(emptyBoard())}
-                        className="border px-3 py-1 rounded"
+                        className="border cursor-pointer px-3 py-1 rounded"
                     >
                         Clear
                     </button>
@@ -139,7 +142,7 @@ export default function Home() {
                 <h2 className="font-semibold text-xl">2 · Crée ta partie</h2>
                 <button
                     onClick={handleCreate}
-                    className="bg-gray-600 text-white px-4 py-2 rounded"
+                    className="bg-gray-600 hover:bg-gray-400 cursor-pointer text-white px-4 py-2 rounded"
                 >
                     🚀 Créer & attendre quelqu’un
                 </button>
@@ -164,7 +167,7 @@ export default function Home() {
               </span>
                             <button
                                 onClick={() => handleJoin(g._id)}
-                                className="bg-green-600 text-white px-3 py-1 rounded"
+                                className="bg-green-600 hover:bg-green-400 cursor-pointer text-white px-3 py-1 rounded"
                             >
                                 Rejoindre
                             </button>

@@ -1,29 +1,33 @@
 import { memo } from "react";
 
 interface BoardProps {
-    grid: number[][];            // 0 sea, 1 ship, 2 hit, -1 miss
+    grid: number[][];
     onShoot?: (x: number, y: number) => void;
     interactive?: boolean;
+    hideShips?: boolean;
 }
-export const Board = memo(({ grid, onShoot, interactive }: BoardProps) => (
+export const Board = memo(({ grid, onShoot, interactive, hideShips }: BoardProps) => (
     <div className="grid grid-cols-10 gap-1">
         {grid.map((row, y) =>
-            row.map((cell, x) => (
-                <div
-                    key={`${x}-${y}`}
-                    onClick={() => interactive && onShoot?.(x, y)}
-                    className={`w-8 h-8 flex items-center justify-center text-xs 
-            ${
-                        cell === 2
-                            ? "bg-red-500"
-                            : cell === -1
-                                ? "bg-gray-400"
-                                : cell === 1
-                                    ? "bg-blue-600"
-                                    : "bg-blue-200"
-                    } cursor-${interactive ? "pointer" : "default"} select-none`}
-                />
-            ))
+            row.map((cell, x) => {
+                const visual = hideShips && cell === 1 ? 0 : cell;   // 🚫 visible
+                return (
+                    <div
+                        key={`${x}-${y}`}
+                        onClick={() => interactive && onShoot?.(x, y)}
+                        className={`
+              w-8 h-8 flex items-center justify-center
+              ${
+                            visual === 2 ? "bg-red-500"
+                                : visual === -1 ? "bg-gray-400"
+                                    : visual === 1 ? "bg-blue-600"
+                                        : "bg-blue-200"
+                        }
+              ${interactive ? "cursor-pointer" : "cursor-default"} select-none
+            `}
+                    />
+                );
+            })
         )}
     </div>
 ));

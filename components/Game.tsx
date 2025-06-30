@@ -1,6 +1,7 @@
 "use client";
 import { Board } from "@/components/Board";
 import { useEffect, useState, useCallback } from "react";
+import toast from "react-hot-toast";
 
 interface GameProps {
     gameId: string;
@@ -41,13 +42,21 @@ export default function Game({ gameId, userId }: GameProps) {
     async function handleShoot(x: number, y: number) {
         if (!myTurn || loadingShot) return;
         setLoadingShot(true);
-        const res = await fetch(`/api/game/${gameId}/shot`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, x, y }),
-        });
-        setLoadingShot(false);
-        if (res.ok) loadState();
+        try {
+            const res = await fetch(`/api/game/${gameId}/shot`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, x, y }),
+            });
+            const { hit, error } = await res.json();
+            if (!res.ok) throw new Error(error);
+            toast.success(hit ? "🎯 Touché !" : "🌊 Plouf…");
+            await loadState();
+        } catch (err: any) {
+            toast.error(err.message ?? "Tir raté (serveur)");
+        } finally {
+            setLoadingShot(false);
+        }
     }
 
     /* -------- ui -------- */
@@ -56,15 +65,23 @@ export default function Game({ gameId, userId }: GameProps) {
         return <p className="animate-pulse">Chargement de la partie…</p>;
     }
 
-    const status =
-        game.boards[enemyIdx].flat().every((c) => c !== 1)
-            ? "🏆 Tu as gagné !"
-            : game.boards[meIdx].flat().every((c) => c !== 1)
-                ? "💥 Tu as perdu…"
-                : myTurn
-                    ? "🫵 À toi de tirer !"
-                    : "⏳ Tour adverse…";
+    const bothReady = game.players.length === 2;
+    const enemyShipsLeft = game.boards[enemyIdx].some((row) => row.includes(1));
+    const myShipsLeft    = game.boards[meIdx]  .some((row) => row.includes(1));
 
+    let status: string;
+    if (!bothReady) {
+        status = "🕐 En attente d’un adversaire…";
+    } else if (!enemyShipsLeft) {
+        status = "🏆 Tu as gagné !";
+    } else if (!myShipsLeft) {
+        status = "💥 Tu as perdu…";
+    } else if (myTurn) {
+        status = "🫵 À toi de tirer !";
+    } else {
+        status = "⏳ Tour adverse…";
+    }
+    const canShoot = bothReady && myTurn && enemyShipsLeft && myShipsLeft;
     return (
         <section className="flex flex-col items-center gap-6">
             <h2 className="text-2xl font-semibold">{status}</h2>
@@ -73,12 +90,16 @@ export default function Game({ gameId, userId }: GameProps) {
                 {/* ----- enemy board (clics actifs) ----- */}
                 <div className="space-y-2">
                     <h3 className="text-lg font-medium text-center">Grille ennemie</h3>
+
                     <Board
                         grid={game.boards[enemyIdx]}
                         onShoot={handleShoot}
-                        interactive={myTurn}
+                        interactive={canShoot}
+                        hideShips
                     />
-                    {myTurn && <p className="text-center text-sm opacity-60">Clique pour tirer</p>}
+                    {canShoot && (
+                        <p className="text-center text-sm text-white">Clique pour tirer</p>
+                    )}
                 </div>
 
                 {/* ----- your board ----- */}
