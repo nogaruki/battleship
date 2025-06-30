@@ -1,19 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongo";
 import Game from "@/models/Game";
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }  //  💡 ⬅ params = Promise
 ) {
+    const { id } = await params;                     // 🔸 on await la Promise
     await dbConnect();
-    const { userId } = await req.json();
-    const game = await Game.findById(params.id);
-    if (!game) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    game.players = game.players.filter((p: any) => p.toString() !== userId);
-    if (game.players.length === 0) await game.deleteOne();
-    else await game.save();
+    const { userId, board } = await req.json();
+    const game = await Game.findById(id);
+
+    if (!game) return NextResponse.json({ error: "Game not found" }, { status: 404 });
+    if (game.players.length > 1)
+        return NextResponse.json({ error: "Game full" }, { status: 400 });
+
+    game.players.push(userId);
+    game.boards[1] = board;
+    await game.save();
 
     return NextResponse.json({ ok: true });
 }
