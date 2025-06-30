@@ -13,7 +13,7 @@ export async function POST(
     if (!game) return NextResponse.json({ error: "Game not found" }, { status: 404 });
     if (game.players.length > 1)
         return NextResponse.json({ error: "Game full" }, { status: 400 });
-~
+
     game.players.push(userId);
     game.boards[1] = board;     // seconde grille
     await game.save();
