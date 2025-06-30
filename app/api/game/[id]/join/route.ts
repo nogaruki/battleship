@@ -3,10 +3,10 @@ import { dbConnect } from "@/lib/mongo";
 import Game from "@/models/Game";
 
 export async function POST(
-    req: NextRequest,                                 // 1️⃣
-    { params }: { params: Promise<{ id: string }> }   // 2️⃣
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;                      // <- on attend la Promise
+    const { id } = await params;
     await dbConnect();
 
     const { userId, board } = await req.json();
