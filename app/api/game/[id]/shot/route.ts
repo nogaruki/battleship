@@ -23,10 +23,21 @@ export async function POST(
     /* -------- maj du plateau -------- */
     const enemyIdx = 1 - playerIdx;
     const hit = game.boards[enemyIdx][y][x] === 1;
+    if (game.boards[enemyIdx][y][x] === 2 || game.boards[enemyIdx][y][x] === -1) {
+        return NextResponse.json({ error: "Already shot here" }, { status: 400 });
+    }
     game.boards[enemyIdx][y][x] = hit ? 2 : -1;
 
     game.shots[playerIdx].push({ x, y, hit });
     game.turn = enemyIdx;
+
+    const enemyShipsLeft = game.boards[enemyIdx].some((row: number[]) => row.includes(1));
+    if (!enemyShipsLeft) {
+        game.finished = true;
+        game.winner   = userId;
+        game.finished = true;
+        game.winner = game.players[playerIdx];
+    }
 
     game.markModified("boards");
 

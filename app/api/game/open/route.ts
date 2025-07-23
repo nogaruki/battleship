@@ -5,6 +5,7 @@ import Game from "@/models/Game";
 export async function GET() {
     await dbConnect();
     const games = await Game.find({ "players.1": { $exists: false } })
+        .sort({ updatedAt: -1 })
         .populate("players", "pseudo")
         .select("_id players")
         .lean();

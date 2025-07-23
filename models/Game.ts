@@ -1,4 +1,3 @@
-// models/Game.ts
 import { Schema, model, models, Types } from "mongoose";
 
 const Shot = new Schema({
@@ -13,6 +12,8 @@ const GameSchema = new Schema(
         boards: { type: [[[Number]]], required: true },
         turn: { type: Number, default: 0 },
         shots: [[Shot]],
+        finished: { type: Boolean, default: false },
+        winner:  { type: Types.ObjectId, ref: "User", default: null },
     },
     { timestamps: true }
 );
