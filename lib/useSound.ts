@@ -1,4 +1,3 @@
-// lib/useSound.ts
 "use client";
 import { useRef, useEffect, useCallback } from "react";
 
