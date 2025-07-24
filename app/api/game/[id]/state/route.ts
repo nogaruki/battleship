@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongo";
 import Game from "@/models/Game";
 import User from "@/models/User";
+void User;
 
 export async function GET(
     _req: NextRequest,
